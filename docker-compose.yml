@@ -44,12 +44,13 @@ services:
       AUTH_SECRET: ${AUTH_SECRET}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
       
-      # Application
-      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL:-http://localhost:3000}
+      # Application (IMPORTANT: Set NEXT_PUBLIC_URL to your server's IP!)
+      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
       DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-local}
       NEXT_PUBLIC_DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-local}
       NODE_ENV: production
-      AUTH_TRUST_HOST: ${NEXT_PUBLIC_URL:-http://localhost:3000}
+      AUTH_TRUST_HOST: ${NEXT_PUBLIC_URL}
+      NEXTAUTH_URL: ${NEXT_PUBLIC_URL}
 
 volumes:
   postgres_data:
