@@ -63,5 +63,5 @@ USER ohuser
 EXPOSE 3000
 
 # Start the application
-# Run migrations then start the standalone server
-CMD ["sh", "-c", "npx prisma migrate deploy || true && node server.js"]
+# Push schema to database (creates tables) then start the server
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node server.js"]
