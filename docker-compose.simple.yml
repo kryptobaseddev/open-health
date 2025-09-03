@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
   database:
     image: postgres:alpine
     restart: unless-stopped
@@ -10,42 +11,37 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - openhealth-network
 
-  docling-serve:
+  # Document Parser Service
+  docling:
     image: ghcr.io/ds4sd/docling-serve:latest
     restart: unless-stopped
-    networks:
-      - openhealth-network
 
+  # Main Application - Pulls from Docker Hub
+  # Replace 'yourdockerhubusername' with your actual Docker Hub username
   app:
-    image: ghcr.io/kryptobaseddev/openhealth:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.production
-    depends_on:
-      - database
-      - docling-serve
-    volumes:
-      - app_data:/app/public/uploads
+    image: yourdockerhubusername/openhealth:latest
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    restart: unless-stopped
-    networks:
-      - openhealth-network
+    depends_on:
+      - database
+      - docling
     environment:
+      # Database
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
-      NODE_ENV: production
+      
+      # Security (MUST CHANGE THESE!)
       AUTH_SECRET: ${AUTH_SECRET}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
-      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL}
+      
+      # Application
+      NEXT_PUBLIC_URL: ${NEXT_PUBLIC_URL:-http://localhost:3000}
       DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-local}
-
-networks:
-  openhealth-network:
-    driver: bridge
+      NODE_ENV: production
+    volumes:
+      - app_uploads:/app/public/uploads
 
 volumes:
   postgres_data:
-  app_data:
+  app_uploads:
