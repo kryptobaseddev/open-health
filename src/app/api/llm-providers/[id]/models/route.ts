@@ -49,22 +49,37 @@ export async function GET(
         })
     } else if (llmProvider.providerId === 'anthropic') {
         if (currentDeploymentEnv === 'cloud') apiKey = process.env.ANTHROPIC_API_KEY as string
-        const results: LLMProviderModel[] = []
-        const anthropic = new Anthropic({apiKey, baseURL: llmProvider.apiURL});
-        const modelsPage = await anthropic.models.list();
-        for await (const models of modelsPage.iterPages()) {
-            const modelList = models.data;
-            results.push(...modelList.filter((model) => {
-                if (currentDeploymentEnv === 'cloud') {
-                    return model.id.startsWith('claude-3-5') || model.id.startsWith('claude-3-7');
-                }
-                return true;
-            }).map(
-                model => ({id: model.id, name: model.id})
-            ))
-        }
+        
+        // Anthropic models are not dynamically listed via API
+        // Using hardcoded list of current models (as of December 2024)
+        const anthropicModels = [
+            // Claude 3.5 Models
+            { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet (Latest)' },
+            { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku' },
+            
+            // Claude 3 Models
+            { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus' },
+            { id: 'claude-3-sonnet-20240229', name: 'Claude 3 Sonnet' },
+            { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku' },
+            
+            // Legacy models for compatibility
+            { id: 'claude-2.1', name: 'Claude 2.1 (Legacy)' },
+            { id: 'claude-2.0', name: 'Claude 2.0 (Legacy)' },
+            { id: 'claude-instant-1.2', name: 'Claude Instant 1.2 (Legacy)' }
+        ];
+        
+        // Filter models based on deployment environment
+        const filteredModels = anthropicModels.filter((model) => {
+            if (currentDeploymentEnv === 'cloud') {
+                // In cloud, only show newer models
+                return model.id.startsWith('claude-3-5') || model.id.startsWith('claude-3-opus');
+            }
+            // In local, show all models
+            return true;
+        });
+        
         return NextResponse.json<LLMProviderModelListResponse>({
-            llmProviderModels: results,
+            llmProviderModels: filteredModels,
         })
     } else if (llmProvider.providerId === 'google') {
         if (currentDeploymentEnv === 'cloud') apiKey = process.env.GOOGLE_API_KEY as string
