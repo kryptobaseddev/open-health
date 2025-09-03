@@ -47,11 +47,12 @@ RUN npm ci --only=production && \
     npm install prisma @prisma/client && \
     npx prisma generate
 
-# Copy built application from builder
+# Copy the standalone build output
+# The standalone folder contains everything needed including server.js at the root
 COPY --from=builder --chown=ohuser:ohuser /app/.next/standalone ./
+# Copy static files that aren't included in standalone by default
 COPY --from=builder --chown=ohuser:ohuser /app/.next/static ./.next/static
 COPY --from=builder --chown=ohuser:ohuser /app/public ./public
-COPY --from=builder --chown=ohuser:ohuser /app/messages ./messages
 
 # Create uploads directory
 RUN mkdir -p public/uploads && chown -R ohuser:ohuser public/uploads
@@ -59,10 +60,6 @@ RUN mkdir -p public/uploads && chown -R ohuser:ohuser public/uploads
 USER ohuser
 EXPOSE 3000
 
-# Health check endpoint
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:3000/api/health || exit 1
-
-# Start the application  
-# Next.js standalone creates the server at the root
-CMD ["sh", "-c", "npx prisma migrate deploy ; node server.js"]
+# Start the application
+# Run migrations then start the standalone server
+CMD ["sh", "-c", "npx prisma migrate deploy || true && node server.js"]
