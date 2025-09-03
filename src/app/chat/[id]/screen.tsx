@@ -105,7 +105,7 @@ export default function Screen(
 
     return (
         <div className="h-screen flex flex-col">
-            <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0">
+            <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0 sticky top-0 z-50">
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="default" onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}>
                         <Menu className="w-4 h-4"/>
