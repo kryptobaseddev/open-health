@@ -6,13 +6,21 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
-RUN npm ci --only=production && \
-    npm install -g prisma && \
-    npx prisma generate
+# Install ALL dependencies (including dev) for build
+RUN npm ci
+
+# Generate Prisma client
+RUN npx prisma generate
 
 # Copy source code
 COPY . .
+
+# Set build-time environment variables
+# These are dummy values just to make the build work
+ENV NEXT_PUBLIC_URL=http://localhost:3000
+ENV DATABASE_URL=postgresql://user:pass@localhost:5432/db
+ENV AUTH_SECRET=dummy_secret_for_build_only
+ENV ENCRYPTION_KEY=dummy_key_for_build_only
 
 # Build application
 RUN npm run build
@@ -27,12 +35,16 @@ RUN apk add --no-cache graphicsmagick curl && \
 
 WORKDIR /app
 
+# Copy package files and install production dependencies only
+COPY package*.json ./
+COPY prisma ./prisma/
+RUN npm ci --only=production && \
+    npx prisma generate
+
 # Copy built application from builder
-COPY --from=builder --chown=ohuser:ohuser /app/.next ./.next
+COPY --from=builder --chown=ohuser:ohuser /app/.next/standalone ./
+COPY --from=builder --chown=ohuser:ohuser /app/.next/static ./.next/static
 COPY --from=builder --chown=ohuser:ohuser /app/public ./public
-COPY --from=builder --chown=ohuser:ohuser /app/package*.json ./
-COPY --from=builder --chown=ohuser:ohuser /app/prisma ./prisma
-COPY --from=builder --chown=ohuser:ohuser /app/node_modules ./node_modules
 COPY --from=builder --chown=ohuser:ohuser /app/messages ./messages
 
 # Create uploads directory
@@ -45,5 +57,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:3000/api/health || exit 1
 
-# Use node directly for better signal handling
-CMD ["node", ".next/standalone/server.js"]
+# Start the application
+CMD ["node", "server.js"]
