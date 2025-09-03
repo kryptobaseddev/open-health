@@ -34,7 +34,7 @@ Every time you push to GitHub:
 3. Build method: **Repository**
 4. Repository URL: `https://github.com/kryptobaseddev/open-health`
 5. Reference: `main`
-6. Compose path: `docker-compose.simple.yml`
+6. Compose path: `docker-compose.yml`
 7. Environment variables (add these in Portainer):
 ```
 POSTGRES_PASSWORD=YourSecurePassword123
@@ -47,7 +47,7 @@ NEXT_PUBLIC_URL=http://your-server-ip:3000
 8. Deploy the stack
 
 ### Method 2: Using Web Editor
-1. Copy contents from: https://raw.githubusercontent.com/kryptobaseddev/open-health/main/docker-compose.simple.yml
+1. Copy contents from: https://raw.githubusercontent.com/kryptobaseddev/open-health/main/docker-compose.yml
 2. Paste in Portainer Web Editor
 3. Add same environment variables
 4. Deploy
