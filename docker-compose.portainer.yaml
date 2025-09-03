@@ -1,0 +1,95 @@
+version: '3.9'
+
+services:
+  database:
+    image: postgres:alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - openhealth-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+    labels:
+      - "com.docker.stack.namespace=openhealth"
+      - "com.docker.compose.project=openhealth"
+
+  docling-serve:
+    image: ghcr.io/ds4sd/docling-serve:latest
+    restart: unless-stopped
+    networks:
+      - openhealth-network
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    labels:
+      - "com.docker.stack.namespace=openhealth"
+      - "com.docker.compose.project=openhealth"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    depends_on:
+      database:
+        condition: service_healthy
+      docling-serve:
+        condition: service_started
+    volumes:
+      - app_data:/app/public/uploads
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - openhealth-network
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      NODE_ENV: production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 1G
+    labels:
+      - "com.docker.stack.namespace=openhealth"
+      - "com.docker.compose.project=openhealth"
+      - "traefik.enable=true"
+      - "traefik.http.routers.openhealth.rule=Host(`openhealth.local`)"
+      - "traefik.http.services.openhealth.loadbalancer.server.port=3000"
+
+networks:
+  openhealth-network:
+    driver: bridge
+    labels:
+      - "com.docker.stack.namespace=openhealth"
+
+volumes:
+  postgres_data:
+    labels:
+      - "com.docker.stack.namespace=openhealth"
+  app_data:
+    labels:
+      - "com.docker.stack.namespace=openhealth"

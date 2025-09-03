@@ -20,7 +20,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
     title: "OpenHealth",
-    description: "OpenHealth",
+    description: "Your Personal Health Data Assistant",
+    manifest: "/manifest.json",
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: "default",
+        title: "OpenHealth"
+    },
+    formatDetection: {
+        telephone: false
+    },
+    openGraph: {
+        type: "website",
+        siteName: "OpenHealth",
+        title: "OpenHealth",
+        description: "Your Personal Health Data Assistant"
+    }
 };
 
 export default async function RootLayout({children, modal}: Readonly<{
