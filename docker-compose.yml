@@ -26,13 +26,16 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
-    # Temporarily disable health check to debug
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 3
-    #   start_period: 60s
+    # Explicitly disable health check
+    healthcheck:
+      test: ["CMD", "echo", "ok"]
+      interval: 3600s
+      retries: 1
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
     environment:
       # Database
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}

@@ -53,6 +53,8 @@ COPY --from=builder --chown=ohuser:ohuser /app/.next/standalone ./
 # Copy static files that aren't included in standalone by default
 COPY --from=builder --chown=ohuser:ohuser /app/.next/static ./.next/static
 COPY --from=builder --chown=ohuser:ohuser /app/public ./public
+# Copy translation messages
+COPY --from=builder --chown=ohuser:ohuser /app/messages ./messages
 
 # Create uploads directory
 RUN mkdir -p public/uploads && chown -R ohuser:ohuser public/uploads
