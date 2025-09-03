@@ -20,7 +20,7 @@ services:
   # Main Application - Pulls from Docker Hub
   # Replace 'yourdockerhubusername' with your actual Docker Hub username
   app:
-    image: yourdockerhubusername/openhealth:latest
+    image: keatonhoskins/openhealth:latest
     restart: unless-stopped
     ports:
       - "3000:3000"
