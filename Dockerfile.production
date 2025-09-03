@@ -15,12 +15,17 @@ RUN npx prisma generate
 # Copy source code
 COPY . .
 
-# Set build-time environment variables
-# These are dummy values just to make the build work
-ENV NEXT_PUBLIC_URL=http://localhost:3000
-ENV DATABASE_URL=postgresql://user:pass@localhost:5432/db
-ENV AUTH_SECRET=dummy_secret_for_build_only
-ENV ENCRYPTION_KEY=dummy_key_for_build_only
+# Set build-time arguments (dummy values just to make the build work)
+ARG NEXT_PUBLIC_URL=http://localhost:3000
+ARG DATABASE_URL=postgresql://user:pass@localhost:5432/db
+ARG AUTH_SECRET=dummy_secret_for_build_only
+ARG ENCRYPTION_KEY=dummy_key_for_build_only
+
+# Convert to ENV for build process
+ENV NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV AUTH_SECRET=$AUTH_SECRET
+ENV ENCRYPTION_KEY=$ENCRYPTION_KEY
 
 # Build application
 RUN npm run build
