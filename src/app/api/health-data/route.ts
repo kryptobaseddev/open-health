@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import {auth} from "@/auth";
 import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import { withCSRFProtection } from "@/lib/csrf";
 import fs from 'fs'
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
@@ -44,6 +45,7 @@ export interface HealthDataCreateResponse extends HealthData {
 export async function POST(
     req: NextRequest
 ) {
+    return withCSRFProtection(req, async () => {
     const session = await auth()
     if (!session || !session.user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
 
@@ -184,6 +186,7 @@ export async function POST(
             return NextResponse.json({error: 'Failed to process file'}, {status: 500});
         }
     }
+    });
 }
 
 export async function GET() {

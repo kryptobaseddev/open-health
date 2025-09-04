@@ -3,6 +3,7 @@ import prisma, {Prisma} from "@/lib/prisma";
 import {auth} from "@/auth";
 import {decrypt} from "@/lib/encryption";
 import { withRateLimit, rateLimitConfigs } from "@/lib/rate-limit";
+import { withCSRFProtection } from "@/lib/csrf";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 import {ChatOpenAI} from "@langchain/openai";
 import {ChatAnthropic} from "@langchain/anthropic";
@@ -55,7 +56,8 @@ export async function POST(
         params: Promise<{ id: string }>,
     }
 ) {
-    return withRateLimit(req, async () => {
+    return withCSRFProtection(req, async () => {
+        return withRateLimit(req, async () => {
         const session = await auth()
         const user = session?.user
         if (!session || !user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
@@ -258,5 +260,6 @@ export async function POST(
                 'Connection': 'keep-alive'
             }
         });
-    }, rateLimitConfigs.chat);
+        }, rateLimitConfigs.chat);
+    });
 }
