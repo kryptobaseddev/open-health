@@ -37,11 +37,11 @@ OpenHealth is a personal health data assistant that allows users to:
 - At 80% context: Prepare session handoff
 - At 85% context: Create session summary and stop
 
-### ✅ CURRENT SYSTEM STATUS (as of Session 3)
+### ✅ CURRENT SYSTEM STATUS (as of Session 4)
 
 #### Working Components
 - ✅ Docker deployment via Portainer
-- ✅ PostgreSQL database with AES-256-CBC encryption
+- ✅ PostgreSQL database with AES-256-GCM encryption (backward compatible)
 - ✅ NextAuth v5 authentication
 - ✅ Prisma ORM with schema
 - ✅ Multi-language support (10 languages)
@@ -52,7 +52,9 @@ OpenHealth is a personal health data assistant that allows users to:
 - ✅ Claude 4 and 3.7 models available
 - ✅ Cached model provider abstraction layer
 - ✅ Dynamic model loading for OpenAI, Google, Ollama
-- ✅ Model capability detection (vision, function calling)
+- ✅ Model capability detection with UI display
+- ✅ Rate limiting on critical endpoints
+- ✅ Authenticated encryption (AEAD) with GCM
 
 #### Technology Stack
 ```yaml
@@ -84,10 +86,10 @@ ANTHROPIC_API_KEY=<if-using-anthropic>
 ### 🚨 KNOWN ISSUES & PRIORITIES
 
 #### HIGH PRIORITY FIXES
-1. **Security Issues** ⚠️
-   - Using deprecated AES-256-CBC (should be AES-256-GCM)
-   - No rate limiting on API endpoints
+1. **Remaining Security Issues** ⚠️
    - Missing CSRF protection
+   - No security headers (CSP, X-Frame-Options, HSTS)
+   - Need audit logging for sensitive operations
 
 2. **Performance Issues** ⚠️
    - No Redis caching for production
@@ -332,6 +334,14 @@ Session 3 (2025-09-04):
 - Added model capability detection
 - Reduced API calls by ~90% with caching
 - Context ended at 40%
+
+Session 4 (2025-09-04):
+- Upgraded encryption from AES-256-CBC to AES-256-GCM
+- Implemented rate limiting for critical endpoints
+- Enhanced UI to display model capabilities
+- Added deprecation warnings for models
+- Improved security with PBKDF2 key derivation
+- Context ended at 45%
 ```
 
 ---
@@ -339,7 +349,7 @@ Session 3 (2025-09-04):
 **USE THIS PROMPT TO RESTORE FULL CONTEXT IN NEXT SESSION**
 **REMEMBER: UPDATE THIS FILE BEFORE ENDING SESSION**
 
-Last Updated: 2025-09-04 (Session 3 Complete)
-Context Level at Save: 40%
-Status: Model provider abstraction complete, caching operational
-Next Priority: Security hardening, performance optimization, UX improvements
+Last Updated: 2025-09-04 (Session 4 Complete)
+Context Level at Save: 45%
+Status: Security hardening partially complete, GCM encryption and rate limiting operational
+Next Priority: CSRF protection, Redis caching, connection pooling, security headers
