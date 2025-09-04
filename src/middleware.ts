@@ -1,4 +1,6 @@
 import {auth as middleware} from '@/auth';
+import { NextResponse } from 'next/server';
+import { withSecurityHeaders } from '@/lib/security-headers';
 
 const signInPathName = '/login';
 
@@ -9,9 +11,22 @@ export default middleware((req) => {
 
     const isAuthenticated = !!req.auth;
 
+    // Handle authentication
+    let response: NextResponse | null = null;
+    
     // Prevent login redirect loop
-    if (nextUrl.pathname === signInPathName) return null;
-    if (!isAuthenticated) return Response.redirect(new URL(signInPathName, nextUrl));
+    if (nextUrl.pathname === signInPathName) {
+        response = NextResponse.next();
+    } else if (!isAuthenticated) {
+        response = NextResponse.redirect(new URL(signInPathName, nextUrl));
+    } else {
+        response = NextResponse.next();
+    }
+
+    // Apply security headers to all responses
+    if (response) {
+        return withSecurityHeaders(response);
+    }
 
     return null;
 })
