@@ -2,12 +2,14 @@ import {NextRequest, NextResponse} from "next/server";
 import {hash} from "bcryptjs";
 import prisma from "@/lib/prisma";
 import { withRateLimit, rateLimitConfigs } from "@/lib/rate-limit";
+import { withCSRFProtection } from "@/lib/csrf";
 import assistantModeSeed from "../../../../../prisma/data/assistant-mode.json";
 import llmProviderSeed from "../../../../../prisma/data/llm-provider.json";
 
 export async function POST(request: NextRequest) {
-    return withRateLimit(request, async () => {
-        try {
+    return withCSRFProtection(request, async () => {
+        return withRateLimit(request, async () => {
+            try {
             const {username, password} = await request.json();
             if (!username || !password) {
                 return NextResponse.json({message: "Username and password are required"}, {status: 400});
@@ -47,9 +49,10 @@ export async function POST(request: NextRequest) {
             })
 
             return NextResponse.json({message: "success"}, {status: 201});
-        } catch (e) {
-            console.error(e);
-            return NextResponse.json({message: "An error occurred"}, {status: 400});
-        }
-    }, rateLimitConfigs.auth);
+            } catch (e) {
+                console.error(e);
+                return NextResponse.json({message: "An error occurred"}, {status: 400});
+            }
+        }, rateLimitConfigs.auth);
+    });
 }
