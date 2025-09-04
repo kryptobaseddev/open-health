@@ -37,7 +37,7 @@ OpenHealth is a personal health data assistant that allows users to:
 - At 80% context: Prepare session handoff
 - At 85% context: Create session summary and stop
 
-### ✅ CURRENT SYSTEM STATUS (as of Session 1)
+### ✅ CURRENT SYSTEM STATUS (as of Session 2)
 
 #### Working Components
 - ✅ Docker deployment via Portainer
@@ -48,6 +48,8 @@ OpenHealth is a personal health data assistant that allows users to:
 - ✅ Mobile responsive PWA
 - ✅ HTTPS via nginx proxy manager
 - ✅ GitHub Actions CI/CD for Docker builds
+- ✅ API key fallback (Database → Environment Variables)
+- ✅ Claude 4 and 3.7 models available
 
 #### Technology Stack
 ```yaml
@@ -79,21 +81,29 @@ ANTHROPIC_API_KEY=<if-using-anthropic>
 ### 🚨 KNOWN ISSUES & PRIORITIES
 
 #### HIGH PRIORITY FIXES
-1. **Anthropic Models Incomplete** ❌
+1. **Dynamic Model Loading** 🔄
    ```javascript
-   // MISSING MODELS - Must add:
-   claude-opus-4-20250514 (Claude 4 Opus)
-   claude-sonnet-4-20250514 (Claude 4 Sonnet)  
-   claude-3-7-sonnet-20250219 (Claude 3.7 Sonnet)
-   // File: /src/app/api/llm-providers/[id]/models/route.ts
+   // ISSUE: Anthropic models are hardcoded
+   // Will become outdated as new models release
+   // Need dynamic loading solution with caching
+   // OpenAI: ✅ Dynamic via API
+   // Google: ✅ Dynamic via API  
+   // Anthropic: ❌ Hardcoded (no API available)
+   // Solution: Implement provider abstraction with fallbacks
    ```
 
-2. **Security Issues** ⚠️
+2. **PR Organization** 📝
+   - Need separate PRs for logical feature groups
+   - Session 1: Docker deployment fixes (7 commits)
+   - Session 2: API key configuration (2 commits)
+   - Keep PRs small and focused
+
+3. **Security Issues** ⚠️
    - Using deprecated AES-256-CBC (should be AES-256-GCM)
    - No rate limiting on API endpoints
    - Missing CSRF protection
 
-3. **Performance Issues** ⚠️
+4. **Performance Issues** ⚠️
    - No caching strategy
    - No database connection pooling
    - Missing image optimization
@@ -251,10 +261,11 @@ test: Add/fix tests
 
 ### 🎯 CURRENT FOCUS AREAS
 
-1. **LLM Provider Integration**
-   - Fix Anthropic model list
-   - Add proper error handling
-   - Implement retry logic
+1. **Dynamic Model Management**
+   - Research provider APIs for model discovery
+   - Design abstraction layer for all providers
+   - Implement caching with TTL
+   - Create fallback strategies
 
 2. **Security Hardening**
    - Upgrade encryption algorithm
@@ -319,6 +330,14 @@ Session 1 (2025-09-03):
 - Configured production URL
 - Created comprehensive documentation
 - Context ended at 85%
+
+Session 2 (2025-09-04):
+- Added missing Claude 4 and 3.7 models
+- Fixed API key configuration with env var fallback
+- Removed confusing deployment environment checks
+- Created PR documentation for changes
+- Reorganized session documentation structure
+- Context ended at 30%
 ```
 
 ---
@@ -326,7 +345,7 @@ Session 1 (2025-09-03):
 **USE THIS PROMPT TO RESTORE FULL CONTEXT IN NEXT SESSION**
 **REMEMBER: UPDATE THIS FILE BEFORE ENDING SESSION**
 
-Last Updated: 2025-09-03 (Session 1 Complete)
-Context Level at Save: 85%
-Status: Production deployed, Anthropic models need Claude 4 updates
-Next Priority: Fix Anthropic Claude 4 models, security improvements
+Last Updated: 2025-09-04 (Session 2 Complete)
+Context Level at Save: 30%
+Status: API keys working via env vars, Claude 4 models added
+Next Priority: Dynamic model loading, PR organization, security improvements
