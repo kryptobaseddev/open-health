@@ -22,16 +22,38 @@ export async function GET(
     const llmProvider = await prisma.lLMProvider.findUniqueOrThrow({
         where: {id}
     });
-    let apiKey: string
-    try {
-        apiKey = decrypt(llmProvider.apiKey)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-        apiKey = ''
+    let apiKey: string = ''
+    
+    // Try to use stored API key first (if not empty)
+    if (llmProvider.apiKey) {
+        try {
+            apiKey = decrypt(llmProvider.apiKey)
+        } catch (e) {
+            // If decryption fails, apiKey remains empty
+            apiKey = ''
+        }
+    }
+    
+    // If no stored key, use environment variables as fallback
+    if (!apiKey) {
+        switch (llmProvider.providerId) {
+            case 'openai':
+                apiKey = process.env.OPENAI_API_KEY || ''
+                break;
+            case 'anthropic':
+                apiKey = process.env.ANTHROPIC_API_KEY || ''
+                break;
+            case 'google':
+                apiKey = process.env.GOOGLE_API_KEY || ''
+                break;
+            case 'ollama':
+                // Ollama doesn't need an API key
+                apiKey = ''
+                break;
+        }
     }
 
     if (llmProvider.providerId === 'openai') {
-        if (currentDeploymentEnv === 'cloud') apiKey = process.env.OPENAI_API_KEY as string
         const results: LLMProviderModel[] = []
         const openAI = new OpenAI({apiKey, baseURL: llmProvider.apiURL})
         const modelsPage = await openAI.models.list()
@@ -48,8 +70,6 @@ export async function GET(
             llmProviderModels: results,
         })
     } else if (llmProvider.providerId === 'anthropic') {
-        if (currentDeploymentEnv === 'cloud') apiKey = process.env.ANTHROPIC_API_KEY as string
-        
         // Anthropic models are not dynamically listed via API
         // Using hardcoded list of current models (as of January 2025)
         const anthropicModels = [
@@ -93,7 +113,6 @@ export async function GET(
             llmProviderModels: filteredModels,
         })
     } else if (llmProvider.providerId === 'google') {
-        if (currentDeploymentEnv === 'cloud') apiKey = process.env.GOOGLE_API_KEY as string
         const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
         url.searchParams.append('key', apiKey);
         url.searchParams.append('pageSize', '1000');

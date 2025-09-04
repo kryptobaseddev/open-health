@@ -88,23 +88,42 @@ export async function POST(
         }
     })
 
-    let apiKey: string
-    if (currentDeploymentEnv === 'local') {
-        apiKey = decrypt(llmProvider.apiKey)
-    } else if (currentDeploymentEnv === 'cloud') {
+    let apiKey: string = ''
+    
+    // Try to use stored API key first (if not empty)
+    if (llmProvider.apiKey) {
+        try {
+            apiKey = decrypt(llmProvider.apiKey)
+        } catch (e) {
+            // If decryption fails, apiKey remains empty
+            console.log('Failed to decrypt stored API key, will try env variables')
+        }
+    }
+    
+    // If no stored key or decryption failed, use environment variables
+    if (!apiKey) {
         switch (llmProvider.providerId) {
             case 'openai':
-                apiKey = process.env.OPENAI_API_KEY as string
+                apiKey = process.env.OPENAI_API_KEY || ''
                 break;
             case 'anthropic':
-                apiKey = process.env.ANTHROPIC_API_KEY as string
+                apiKey = process.env.ANTHROPIC_API_KEY || ''
                 break;
             case 'google':
-                apiKey = process.env.GOOGLE_API_KEY as string
+                apiKey = process.env.GOOGLE_API_KEY || ''
+                break;
+            case 'ollama':
+                // Ollama doesn't need an API key
+                apiKey = ''
                 break;
             default:
                 throw new Error('Unsupported LLM provider');
         }
+    }
+    
+    // Validate we have an API key (except for Ollama)
+    if (!apiKey && llmProvider.providerId !== 'ollama') {
+        throw new Error(`No API key available for ${llmProvider.providerId}. Please set it in the UI or as an environment variable.`)
     }
 
     const messages = [
