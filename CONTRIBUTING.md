@@ -17,8 +17,15 @@ AI can be wrong. But so can traditional medicine. Ultimately, you are responsibl
 
 ### For Developers
 
-- **Submit Pull Requests**: If you encounter any inconvenience while using OpenHealth, feel free to submit a pull request. No contribution is too small!
-- **Start with Good First Issues**: New to the project? Check out our [good first issues](https://github.com/OpenHealthForAll/open-health/labels/good%20first%20issue) to get started.
+⚠️ **MANDATORY READING**: [.github/PR-BEST-PRACTICES.md](.github/PR-BEST-PRACTICES.md)
+
+**All code contributions MUST follow our immutable PR rules:**
+- **Max 200 lines per PR** (HARD LIMIT - NO EXCEPTIONS)
+- **Test on your fork first** (MANDATORY - NO DIRECT UPSTREAM PRs)
+- **One feature per PR** (ABSOLUTE RULE - NO BUNDLING)
+
+- **Submit Pull Requests**: After reading our PR rules and testing on your fork first!
+- **Start with Good First Issues**: Check out our [good first issues](https://github.com/OpenHealthForAll/open-health/labels/good%20first%20issue) to get started.
 - **Collaborate**: If you have an existing service, we're open to exploring synergies and integration possibilities. Let's work together to create something greater!
 
 ### For Users
