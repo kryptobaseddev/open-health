@@ -25,7 +25,7 @@ services:
       - app_data:/app/public/uploads
     ports:
       - "3000:3000"
-    restart: unless-stopped
+    restart: always
     # Explicitly disable health check
     healthcheck:
       test: ["CMD", "echo", "ok"]
@@ -49,8 +49,11 @@ services:
       DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-local}
       NEXT_PUBLIC_DEPLOYMENT_ENV: ${DEPLOYMENT_ENV:-local}
       NODE_ENV: production
+<<<<<<< HEAD
       AUTH_TRUST_HOST: ${NEXT_PUBLIC_URL}
       NEXTAUTH_URL: ${NEXT_PUBLIC_URL}
+=======
+>>>>>>> feat/build-optimizations
 
 volumes:
   postgres_data:
