@@ -203,10 +203,41 @@ export default function ChatSettingSideBar({chatRoomId}: ChatSettingSideBarProps
                         <SelectTrigger>
                             <SelectValue placeholder={t('selectModel')}/>
                         </SelectTrigger>
-                        <SelectContent className={cn('bg-white')}>
+                        <SelectContent className={cn('bg-white max-h-96 overflow-y-auto')}>
                             {llmProviderModels.map((model) => (
                                 <SelectItem key={model.id} value={model.id}>
-                                    {model.name}
+                                    <div className="flex flex-col">
+                                        <div className="flex items-center gap-2">
+                                            <span>{model.name}</span>
+                                            {model.deprecated && (
+                                                <span className="text-xs bg-yellow-100 text-yellow-800 px-1.5 py-0.5 rounded">
+                                                    Deprecated
+                                                </span>
+                                            )}
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
+                                            {model.capabilities?.vision && (
+                                                <span className="bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">
+                                                    Vision
+                                                </span>
+                                            )}
+                                            {model.capabilities?.functionCalling && (
+                                                <span className="bg-green-50 text-green-700 px-1.5 py-0.5 rounded">
+                                                    Functions
+                                                </span>
+                                            )}
+                                            {model.capabilities?.maxTokens && (
+                                                <span className="bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                                    {model.capabilities.maxTokens.toLocaleString()} tokens
+                                                </span>
+                                            )}
+                                        </div>
+                                        {model.deprecationNotice && (
+                                            <div className="text-xs text-yellow-700 mt-1">
+                                                {model.deprecationNotice}
+                                            </div>
+                                        )}
+                                    </div>
                                 </SelectItem>
                             ))}
 

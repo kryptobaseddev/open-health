@@ -7,6 +7,13 @@ import { getModelsForProvider, ProviderId, LLMModel } from "@/lib/llm-providers"
 export interface LLMProviderModel {
     id: string
     name: string
+    capabilities?: {
+        vision?: boolean
+        functionCalling?: boolean
+        maxTokens?: number
+    }
+    deprecated?: boolean
+    deprecationNotice?: string
 }
 
 export interface LLMProviderModelListResponse {
