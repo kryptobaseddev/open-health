@@ -1,5 +1,15 @@
 # OPENHEALTH SESSION RECOVERY PROMPT
-## CRITICAL: READ THIS FIRST TO RESTORE FULL CONTEXT
+## ⚠️ CRITICAL: READ THIS FIRST TO RESTORE FULL CONTEXT
+
+### 🚨 MANDATORY PR-FIRST DEVELOPMENT
+**EVERY SINGLE CHANGE MUST FOLLOW THESE RULES - NO EXCEPTIONS:**
+- ✅ **NEVER commit directly to main** - ALL changes via PRs only
+- ✅ **Under 200 lines** - If bigger, MUST split into multiple PRs
+- ✅ **Single purpose** - Each PR does exactly ONE thing
+- ✅ **Test on fork first** - Create PR to YOUR fork, test, merge
+- ✅ **Follow .github/PR-BEST-PRACTICES.md** - Read before starting ANY work
+
+**VIOLATIONS = IMMEDIATE SESSION TERMINATION**
 
 ### 🎯 PROJECT OVERVIEW
 OpenHealth is a personal health data assistant that allows users to:
@@ -98,19 +108,39 @@ ANTHROPIC_API_KEY=<if-using-anthropic>
 
 ### 🛠️ CRITICAL RULES - NO EXCEPTIONS
 
-1. **NO BREAKING PRODUCTION**:
+1. **MANDATORY PR WORKFLOW** ⚠️:
+   ```bash
+   # EVERY change MUST follow this workflow:
+   # 1. Create feature branch: git checkout -b feat/specific-change
+   # 2. Implement ONE focused change only (<200 lines, <5 files, <30min)
+   # 3. Test thoroughly: npm run build && npm run dev
+   # 4. Commit with conventional format: feat/fix/docs/etc
+   # 5. Create PR to YOUR fork first
+   # 6. Test PR on fork, merge after validation
+   # 7. Only then create upstream PR (optional)
+   ```
+
+2. **FORK-FIRST DEVELOPMENT** 🔥:
+   - ALL development happens on YOUR fork first
+   - NEVER commit directly to main
+   - EVERY feature gets its own branch and PR
+   - Test EVERYTHING on your fork before upstream
+   - See .github/PR-BEST-PRACTICES.md for full rules
+
+3. **NO BREAKING PRODUCTION**:
    - Test all changes locally first
    - Keep backup of working configurations
    - Document all environment variable changes
 
-2. **MAINTAIN COMPATIBILITY**:
+4. **MAINTAIN COMPATIBILITY**:
    - Don't break existing user data
    - Preserve database schema migrations
    - Keep API endpoints backward compatible
 
-3. **DOCKER DEPLOYMENT FLOW**:
+5. **DOCKER DEPLOYMENT FLOW**:
    ```bash
    # Changes flow:
+   Feature Branch → PR to Fork → Test & Merge → Optional Upstream PR
    Code Change → Git Push → GitHub Actions → Docker Hub → Portainer Update
    ```
 
@@ -118,18 +148,28 @@ ANTHROPIC_API_KEY=<if-using-anthropic>
 
 Before claiming ANY fix is complete:
 
-1. **Test Locally**:
+1. **PR SIZE COMPLIANCE** ⚠️:
+   ```bash
+   # EVERY change MUST be:
+   # - Under 200 lines total (additions + deletions)
+   # - Under 5 files changed
+   # - Under 30 minutes implementation time
+   # - Single purpose only (can describe in one sentence)
+   # - Independently deployable
+   ```
+
+2. **Test Locally**:
    ```bash
    npm run dev
    # Test the specific feature
    ```
 
-2. **Build Docker Image**:
+3. **Build Docker Image**:
    ```bash
    docker build -f Dockerfile.production -t openhealth:test .
    ```
 
-3. **Verify No Breaking Changes**:
+4. **Verify No Breaking Changes**:
    ```bash
    # Check TypeScript
    npm run build
@@ -138,15 +178,33 @@ Before claiming ANY fix is complete:
    npx prisma validate
    ```
 
-### 🔄 WORKFLOW PATTERN
+5. **PR WORKFLOW COMPLIANCE** 🔥:
+   ```bash
+   # Before starting ANY work:
+   git checkout -b feat/your-specific-change
+   
+   # After completing work:
+   git add . && git commit -m "feat: your specific change"
+   gh pr create --title "feat: your specific change" --body "..." --base main
+   
+   # Test on fork, then merge
+   gh pr merge X --squash
+   ```
 
-For EACH task:
-1. **Review** - Understand current implementation
-2. **Plan** - Document what changes are needed
-3. **Implement** - Make the changes
-4. **Test** - Verify locally
-5. **Document** - Update relevant docs
-6. **Commit** - Use conventional commit format
+### 🔄 MANDATORY WORKFLOW PATTERN
+
+For EACH task (NO EXCEPTIONS):
+1. **Size Check** - Can this be done in <200 lines, <5 files, <30 minutes?
+2. **Branch** - Create feature branch: `git checkout -b feat/specific-change`
+3. **Review** - Understand current implementation
+4. **Plan** - Document what changes are needed (single purpose only)
+5. **Implement** - Make the ONE focused change only
+6. **Test** - Verify locally (`npm run build && npm run dev`)
+7. **Commit** - Use conventional commit format
+8. **PR to Fork** - Create PR to YOUR fork first
+9. **Test PR** - Validate PR works on fork
+10. **Merge** - Merge PR after successful testing
+11. **Document** - Update session tracking
 
 ### 🚀 SESSION START COMMANDS
 
@@ -154,28 +212,40 @@ For EACH task:
 # 1. Navigate to project
 cd /mnt/projects/open-health
 
-# 2. Check git status
+# 2. Check git status and branch
 git status
+git branch -a
 
-# 3. Check current Docker image
-docker images | grep openhealth
+# 3. Read PR best practices (MANDATORY)
+cat .github/PR-BEST-PRACTICES.md
 
-# 4. Verify environment
+# 4. Check existing PRs status
+gh pr list --state open
+
+# 5. Verify environment
 cat .env.example
 
-# 5. Test local development
+# 6. Test local development
 npm run dev
+
+# 7. Before ANY work - Create feature branch
+git checkout -b feat/your-specific-change-name
 ```
 
 ### 📊 SUCCESS METRICS
 
 A session is successful when:
+- ✅ **ALL changes in separate PRs** (NO direct main commits)
+- ✅ **ALL PRs under 200 lines** (size compliance)
+- ✅ **ALL PRs single purpose** (focus compliance) 
+- ✅ **ALL PRs tested on fork** (quality compliance)
 - ✅ All changes tested locally
 - ✅ Docker build succeeds
 - ✅ No breaking changes introduced
 - ✅ Documentation updated
 - ✅ Conventional commits used
 - ✅ Session summary created
+- ✅ **PR best practices followed** (MANDATORY)
 
 ### 🔧 DEBUGGING QUICK REFERENCE
 
@@ -214,23 +284,38 @@ npx prisma db push
 
 At end of EACH session:
 
-1. **Create Session Summary**:
+1. **Verify ALL PRs Created**:
    ```bash
-   # Save as SESSION-[N]-SUMMARY.md
-   # Include: achievements, issues fixed, files changed, next priorities
+   # Check that NO changes were committed directly to main
+   gh pr list --state open
+   # Every feature should have its own PR
    ```
 
-2. **Update This Recovery Prompt**:
+2. **Create Session Summary**:
+   ```bash
+   # Save as .claude/sessions/SESSION-[N]-SUMMARY.md
+   # Include: PR list, achievements, next priorities
+   ```
+
+3. **Update This Recovery Prompt**:
    ```bash
    # Update the "CURRENT SYSTEM STATUS" section
    # Add new issues to "KNOWN ISSUES"
    # Update environment variables if changed
    ```
 
-3. **Commit Checkpoint**:
+4. **Final PR Compliance Check**:
    ```bash
-   git add -A
-   git commit -m "chore: Session [N] checkpoint - [brief description]"
+   # Verify all PRs meet size requirements
+   # Verify all PRs are single purpose
+   # Verify all PRs have clear test instructions
+   ```
+
+5. **Commit Documentation Only**:
+   ```bash
+   # Only documentation changes go to main
+   git add .claude/ NEXT-SESSION-RECOVERY-PROMPT.md
+   git commit -m "docs: Session [N] checkpoint - [brief description]"
    git push origin main
    ```
 
