@@ -87,7 +87,10 @@ src/
 │   │   └── parser/        # Document and vision parsing logic
 │   │       ├── document/  # Document parsers (Docling, Upstage)
 │   │       └── vision/    # Vision parsers (OpenAI, Google, Ollama)
-│   └── encryption/        # Data encryption utilities
+│   ├── encryption/        # Data encryption utilities (AES-256-GCM)
+│   ├── csrf/              # CSRF protection middleware
+│   ├── rate-limit/        # Rate limiting middleware
+│   └── security-headers/  # Security headers middleware
 └── trigger/               # Background job definitions
 ```
 
@@ -113,8 +116,11 @@ src/
 4. **Authentication & Security**
    - NextAuth v5 with credentials provider
    - bcrypt password hashing
-   - Data encryption using AES-256-GCM
+   - Data encryption using AES-256-GCM with PBKDF2 key derivation
    - Session-based authentication with JWT
+   - CSRF protection using double-submit cookie pattern
+   - Comprehensive security headers middleware
+   - Rate limiting on critical endpoints
 
 5. **Parallel Route Architecture**
    - Modal routes using `@modal` parallel route
@@ -158,6 +164,26 @@ Common response patterns:
 - Error: `{ error: string, code?: string }`
 - Pagination: `{ data: T[], total: number, page: number }`
 
+## Security Features
+
+### Implemented Security Measures
+- **Encryption**: AES-256-GCM with authenticated encryption (Session 4)
+- **Rate Limiting**: Configurable limits on auth, API, and chat endpoints (Session 4)
+- **CSRF Protection**: Double-submit cookie pattern on 5 critical endpoints (Session 5)
+- **Security Headers**: 7 comprehensive headers via middleware (Session 5)
+  - Content-Security-Policy
+  - X-Frame-Options: DENY
+  - X-Content-Type-Options: nosniff
+  - Strict-Transport-Security (production only)
+  - Referrer-Policy
+  - Permissions-Policy
+  - X-XSS-Protection
+
+### Security TODO (Session 6)
+- Complete CSRF protection for remaining 4 endpoints
+- Implement audit logging for sensitive operations
+- Add security monitoring and alerting
+
 ## Testing Approach
 
 Currently, the project does not have a formal test suite. When implementing tests:
@@ -165,3 +191,19 @@ Currently, the project does not have a formal test suite. When implementing test
 - Focus on parser logic and data transformation
 - Test encryption/decryption workflows
 - Validate API endpoint security
+- Test CSRF token generation and validation
+- Verify security headers in responses
+
+## Session Progress
+
+### Session 5 (2025-09-04) Complete
+- ✅ CSRF protection for 5 critical endpoints
+- ✅ Security headers middleware implementation
+- ✅ Both features pushed to fork branches for testing
+- Context usage: ~65%
+
+### Session 6 Priorities
+1. Complete CSRF protection for remaining endpoints
+2. Implement audit logging system
+3. Add Redis caching for production
+4. Test and merge security features from fork
